@@ -2,34 +2,43 @@ package com.saturn.SpringBootMvc.SpringBootMvc.controllers;
 
 
 import com.saturn.SpringBootMvc.SpringBootMvc.dtos.EmployeeDTO;
+import com.saturn.SpringBootMvc.SpringBootMvc.services.EmployeeService;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/emp")
 public class EmployeeController {
 
-    @GetMapping("/{empId}")
+    private final EmployeeService employeeService;
+
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
+
+    @GetMapping(path="/")
+    public List<EmployeeDTO> getAllEmployees(){
+        return employeeService.getAllEmployees();
+    }
+
+    @GetMapping(path = "/{empId}")
     public EmployeeDTO getEmployeeById(@PathVariable Long empId){
-        return new EmployeeDTO(empId,"Minnie","minnie@gidle.com",28, LocalDate.of(2017,2,24), true);
+        return employeeService.getEmployeeById(empId);
     }
 
-    @GetMapping("/")
-    public String getAllEmployees(@RequestParam(required = false) String age){
-        return age;
-
+    @PostMapping(path = "/")
+    public EmployeeDTO saveEmployee(@RequestBody EmployeeDTO employee){
+        return employeeService.saveEmployee(employee);
     }
 
-    @PostMapping()
-    public EmployeeDTO createNewEmployee(@RequestBody EmployeeDTO employee){
-        return employee;
+    @PutMapping(path = "/{empId}")
+    public EmployeeDTO updateEmployeeById(@PathVariable Long empId,@RequestBody EmployeeDTO employee){
+        return employeeService.updateEmployeeById(empId, employee);
     }
 
-    @PutMapping()
-    public Long updateEmployeeById(@PathVariable Long empId){
-        return empId;
+    @DeleteMapping(path = "/{empId}")
+    public boolean deleteEmployeeById(@PathVariable Long empId){
+        return employeeService.deleteEmpById(empId);
     }
-
 }
