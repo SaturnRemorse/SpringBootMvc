@@ -1,7 +1,9 @@
 package com.saturn.SpringBootMvc.SpringBootMvc.controllers;
 
 
+import com.saturn.SpringBootMvc.SpringBootMvc.annotations.EmployeeAgeValidation;
 import com.saturn.SpringBootMvc.SpringBootMvc.dtos.EmployeeDTO;
+import com.saturn.SpringBootMvc.SpringBootMvc.exceptions.ResourceNotFoundException;
 import com.saturn.SpringBootMvc.SpringBootMvc.services.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -30,8 +33,10 @@ public class EmployeeController {
     @GetMapping(path = "/{empId}")
     public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long empId){
         Optional<EmployeeDTO> employeeDTO = employeeService.getEmployeeById(empId);
-        return employeeDTO.map(employeeDTO1 -> ResponseEntity.ok(employeeDTO1)).orElse(ResponseEntity.notFound().build());
+        return employeeDTO.map(employeeDTO1 -> ResponseEntity.ok(employeeDTO1)).orElseThrow(() -> new ResourceNotFoundException("Employee Not Found with id "+empId));
     }
+
+
 
     @PostMapping(path = "/")
     public ResponseEntity<EmployeeDTO> saveEmployee(@RequestBody @Valid EmployeeDTO employee){

@@ -3,6 +3,7 @@ package com.saturn.SpringBootMvc.SpringBootMvc.services;
 import ch.qos.logback.core.model.Model;
 import com.saturn.SpringBootMvc.SpringBootMvc.dtos.EmployeeDTO;
 import com.saturn.SpringBootMvc.SpringBootMvc.entities.EmployeeEntity;
+import com.saturn.SpringBootMvc.SpringBootMvc.exceptions.ResourceNotFoundException;
 import com.saturn.SpringBootMvc.SpringBootMvc.repositories.EmployeeRepo;
 import lombok.RequiredArgsConstructor;
 import org.apache.el.util.ReflectionUtil;
@@ -47,13 +48,21 @@ public class EmployeeService {
 
     public EmployeeDTO updateEmployeeById(Long empId, EmployeeDTO employee) {
         EmployeeEntity emp = mapper.map(employee, EmployeeEntity.class);
-        emp.setId(empId);
-        EmployeeEntity updatedEmployee = employeeRepo.save(emp);
+        EmployeeEntity updatedEmployee = null;
+        if(isExistsById(empId)) {
+            emp.setId(empId);
+            updatedEmployee = employeeRepo.save(emp);
+        }
         return mapper.map(updatedEmployee, EmployeeDTO.class);
     }
 
     public boolean isExistsById(Long empId){
-        return employeeRepo.existsById(empId);
+        if(employeeRepo.existsById(empId)){
+            return true;
+        }else{
+            throw new ResourceNotFoundException("Employee not found with id "+empId);
+        }
+
     }
 
     public boolean deleteEmpById(Long empId) {
@@ -66,16 +75,13 @@ public class EmployeeService {
     }
 
     public EmployeeDTO updatePartialEmployee(Long empId, Map<String, Object> data) {
-        if(!isExistsById(empId)){
-            return null;
-        }
-        EmployeeEntity entity = employeeRepo.findById(empId).get();
-        data.forEach((key, value) ->{
-            Field fieldToBeUpdated = ReflectionUtils.findField(EmployeeEntity.class, key );
-            fieldToBeUpdated.setAccessible(true);
-            ReflectionUtils.setField(fieldToBeUpdated, entity, value);
+            EmployeeEntity entity = employeeRepo.findById(empId).orElseThrow( () -> new ResourceNotFoundException("Employee not Found with id "+ empId));
+            data.forEach((key, value) -> {
+                Field fieldToBeUpdated = ReflectionUtils.findField(EmployeeEntity.class, key);
+                fieldToBeUpdated.setAccessible(true);
+                ReflectionUtils.setField(fieldToBeUpdated, entity, value);
 
-        });
+            });
         return mapper.map(employeeRepo.save(entity), EmployeeDTO.class);
 
     }
