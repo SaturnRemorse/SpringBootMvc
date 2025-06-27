@@ -3,6 +3,7 @@ package com.saturn.SpringBootMvc.SpringBootMvc.controllers;
 
 import com.saturn.SpringBootMvc.SpringBootMvc.dtos.EmployeeDTO;
 import com.saturn.SpringBootMvc.SpringBootMvc.services.EmployeeService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,12 +34,12 @@ public class EmployeeController {
     }
 
     @PostMapping(path = "/")
-    public ResponseEntity<EmployeeDTO> saveEmployee(@RequestBody EmployeeDTO employee){
+    public ResponseEntity<EmployeeDTO> saveEmployee(@RequestBody @Valid EmployeeDTO employee){
         return new ResponseEntity<>(employeeService.saveEmployee(employee),HttpStatus.CREATED);
     }
 
     @PutMapping(path = "/{empId}")
-    public ResponseEntity<EmployeeDTO> updateEmployeeById(@PathVariable Long empId,@RequestBody EmployeeDTO employee){
+    public ResponseEntity<EmployeeDTO> updateEmployeeById(@PathVariable Long empId,@RequestBody @Valid EmployeeDTO employee){
         return new ResponseEntity<>(employeeService.updateEmployeeById(empId, employee), HttpStatus.OK);
     }
 
