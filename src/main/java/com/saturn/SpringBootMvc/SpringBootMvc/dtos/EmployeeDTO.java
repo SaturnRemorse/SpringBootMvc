@@ -1,5 +1,7 @@
 package com.saturn.SpringBootMvc.SpringBootMvc.dtos;
 
+import com.saturn.SpringBootMvc.SpringBootMvc.annotations.EmployeeAgeValidation;
+import com.saturn.SpringBootMvc.SpringBootMvc.annotations.EmployeeRoleValidation;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,8 +26,9 @@ public class EmployeeDTO {
     @Email(message = "email not in correct format")
     private String email;
 
-    @Max(value = 40, message = "age should be below 40")
-    @Min(value = 10, message = "age should be above 10")
+//    @Max(value = 40, message = "age should be below 40")
+//    @Min(value = 10, message = "age should be above 10")
+    @EmployeeAgeValidation
     private Integer age;
 
     @NotNull(message = "points cannot be blank")
@@ -33,8 +36,9 @@ public class EmployeeDTO {
     @Digits(integer = 2, fraction = 2, message = "points should be in the format of XX.YY")
     private Double points;
 
-    @Pattern(regexp = "^(DRIVER|ENGINEER)$", message = "role can be DRIVER OR ENGINEER ")
+    //@Pattern(regexp = "^(DRIVER|ENGINEER)$", message = "role can be DRIVER OR ENGINEER ")
     @NotBlank(message = "role cannot be blank")
+    @EmployeeRoleValidation
     private String role; //DRIVER OR ENGINEER
 
     @PastOrPresent(message = "date of joining cannot be from future")
