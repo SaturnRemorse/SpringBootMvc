@@ -16,22 +16,26 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiError> handleResourceNotFound(ResourceNotFoundException exception){
+    public ResponseEntity<ApiResponse<?>> handleResourceNotFound(ResourceNotFoundException exception){
         ApiError error = ApiError.builder().status(HttpStatus.NOT_FOUND).message(List.of(exception.getMessage())).build();
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return buildApiResponse(error);
 
+    }
+
+    private ResponseEntity<ApiResponse<?>> buildApiResponse(ApiError error){
+        return new ResponseEntity<>(new ApiResponse<>(error), error.getStatus());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleInternalServerError(Exception e){
+    public ResponseEntity<ApiResponse<?>> handleInternalServerError(Exception e){
         ApiError error = ApiError.builder().status(HttpStatus.INTERNAL_SERVER_ERROR).message(List.of(e.getMessage())).build();
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildApiResponse(error);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleValidationException(MethodArgumentNotValidException e){
+    public ResponseEntity<ApiResponse<?>> handleValidationException(MethodArgumentNotValidException e){
         List<String> errors = e.getBindingResult().getAllErrors().stream().map(error -> error.getDefaultMessage()).toList();
         ApiError error = ApiError.builder().status(HttpStatus.BAD_REQUEST).message(errors).build();
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        return buildApiResponse(error);
     }
 }
